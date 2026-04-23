@@ -1,0 +1,221 @@
+/* ─── Design tokens ────────────────────────────────────────────── */
+:root {
+  /* Media type colors */
+  --anime: #1d9e75;
+  --anime-bg: rgba(29, 158, 117, 0.12);
+  --manga: #7f77dd;
+  --manga-bg: rgba(127, 119, 221, 0.12);
+  --game: #ef9f27;
+  --game-bg: rgba(239, 159, 39, 0.12);
+
+  /* Status colors */
+  --status-plan: #6b7280;
+  --status-ongoing: #3b82f6;
+  --status-completed: #22c55e;
+  --status-dropped: #ef4444;
+
+  /* Surface & background */
+  --bg: #0e0e14;
+  --surface: #16161f;
+  --surface-2: #1e1e2a;
+  --surface-3: #252532;
+
+  /* Text */
+  --text: #e2e0eb;
+  --text-muted: #7c7a8a;
+  --text-faint: #4a4858;
+
+  /* Border */
+  --border: rgba(255, 255, 255, 0.07);
+  --border-md: rgba(255, 255, 255, 0.12);
+
+  /* Accent */
+  --accent: #7f77dd;
+  --accent-hover: #9590e8;
+
+  /* Radius */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  /* Font */
+  --font: system-ui, "Segoe UI", Roboto, sans-serif;
+
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Reset ────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ─── Body & root ──────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+}
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Layout wrapper ───────────────────────────────────────────── */
+.page-content {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+/* ─── Utility ──────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* ─── Badges ───────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.02em;
+}
+.badge-anime {
+  background: var(--anime-bg);
+  color: var(--anime);
+}
+.badge-manga {
+  background: var(--manga-bg);
+  color: var(--manga);
+}
+.badge-game {
+  background: var(--game-bg);
+  color: var(--game);
+}
+
+/* ─── Status chips ─────────────────────────────────────────────── */
+.status-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.status-plan {
+  background: rgba(107, 114, 128, 0.15);
+  color: var(--status-plan);
+}
+.status-ongoing {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--status-ongoing);
+}
+.status-completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--status-completed);
+}
+.status-dropped {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--status-dropped);
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-3);
+  color: var(--text);
+  border: 1px solid var(--border-md);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--border-md);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* ─── Inputs ───────────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input::placeholder {
+  color: var(--text-faint);
+}
+.input:focus {
+  border-color: var(--accent);
+}

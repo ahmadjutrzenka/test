@@ -1,0 +1,685 @@
+{
+  "info": {
+    "name": "Questivate API",
+    "_postman_id": "questivate-2026",
+    "description": "Complete API collection for Questivate — VibeSync individual project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "token2", "value": "", "type": "string" },
+    { "key": "collection_id", "value": "", "type": "string" },
+    { "key": "review_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ahmad\",\n  \"email\": \"ahmad@mail.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register — email sudah dipakai Google",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"tryagain\",\n  \"email\": \"google_user@gmail.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register — missing fields (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nousername@mail.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.access_token) pm.collectionVariables.set('token', res.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmad@mail.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login — wrong password (401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ahmad@mail.com\",\n  \"password\": \"salahpassword\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login — missing email (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Google Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "access_token_google", "value": "PASTE_GOOGLE_ID_TOKEN_HERE" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/google-login", "host": ["{{base_url}}"], "path": ["auth", "google-login"] },
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"] }
+          }
+        },
+        {
+          "name": "Get My Profile — no token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"] }
+          }
+        },
+        {
+          "name": "Update My Profile (bio)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Anime enjoyer, manga reader, gamer. Taste: dark atmosphere, complex characters.\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Users (Public)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "Search Users by username",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users?q=ahmad",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [{ "key": "q", "value": "ahmad" }]
+            }
+          }
+        },
+        {
+          "name": "Get Public Profile by username",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/ahmad", "host": ["{{base_url}}"], "path": ["users", "ahmad"] }
+          }
+        },
+        {
+          "name": "Get Public Profile — not found (404)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/users/usertidakada", "host": ["{{base_url}}"], "path": ["users", "usertidakada"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Collections",
+      "item": [
+        {
+          "name": "Get My Collections",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/collections", "host": ["{{base_url}}"], "path": ["collections"] }
+          }
+        },
+        {
+          "name": "Get My Collections — filter by type",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/collections?type=anime",
+              "host": ["{{base_url}}"],
+              "path": ["collections"],
+              "query": [{ "key": "type", "value": "anime" }]
+            }
+          }
+        },
+        {
+          "name": "Get My Collections — invalid type (400)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/collections?type=movie",
+              "host": ["{{base_url}}"],
+              "path": ["collections"],
+              "query": [{ "key": "type", "value": "movie" }]
+            }
+          }
+        },
+        {
+          "name": "Add Collection (anime)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.collection && res.collection.id) pm.collectionVariables.set('collection_id', res.collection.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections", "host": ["{{base_url}}"], "path": ["collections"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mediaType\": \"anime\",\n  \"externalId\": \"5114\",\n  \"title\": \"Fullmetal Alchemist: Brotherhood\",\n  \"coverUrl\": \"https://cdn.myanimelist.net/images/anime/1208/94745.jpg\",\n  \"genres\": [\"Action\", \"Adventure\", \"Drama\", \"Fantasy\"],\n  \"synopsis\": \"Two brothers search for the Philosopher's Stone after a botched alchemy experiment.\",\n  \"score\": 9.11,\n  \"status\": \"completed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Collection (manga)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections", "host": ["{{base_url}}"], "path": ["collections"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mediaType\": \"manga\",\n  \"externalId\": \"13\",\n  \"title\": \"One Piece\",\n  \"coverUrl\": \"https://cdn.myanimelist.net/images/manga/2/253146.jpg\",\n  \"genres\": [\"Action\", \"Adventure\", \"Comedy\", \"Fantasy\"],\n  \"synopsis\": \"Monkey D. Luffy sets out to become King of the Pirates.\",\n  \"score\": 9.2,\n  \"status\": \"ongoing\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Collection (game)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections", "host": ["{{base_url}}"], "path": ["collections"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mediaType\": \"game\",\n  \"externalId\": \"1877\",\n  \"title\": \"Sekiro: Shadows Die Twice\",\n  \"coverUrl\": \"https://images.igdb.com/igdb/image/upload/t_cover_big/co1jq1.jpg\",\n  \"genres\": [\"Action\", \"Adventure\"],\n  \"synopsis\": \"A shinobi must rescue his lord and get revenge.\",\n  \"score\": 9.0,\n  \"status\": \"ongoing\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Collection — missing required field (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections", "host": ["{{base_url}}"], "path": ["collections"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mediaType\": \"anime\",\n  \"externalId\": \"5114\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Collection by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/collections/{{collection_id}}", "host": ["{{base_url}}"], "path": ["collections", "{{collection_id}}"] }
+          }
+        },
+        {
+          "name": "Update Collection (status + isFavorite)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections/{{collection_id}}", "host": ["{{base_url}}"], "path": ["collections", "{{collection_id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"isFavorite\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Collection — exceed 5 favorites (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections/{{collection_id}}", "host": ["{{base_url}}"], "path": ["collections", "{{collection_id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isFavorite\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Collection — milik user lain (403)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/collections/{{collection_id}}", "host": ["{{base_url}}"], "path": ["collections", "{{collection_id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"dropped\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Collection",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/collections/{{collection_id}}", "host": ["{{base_url}}"], "path": ["collections", "{{collection_id}}"] }
+          }
+        },
+        {
+          "name": "Delete Collection — not found (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/collections/999999", "host": ["{{base_url}}"], "path": ["collections", "999999"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Reviews",
+      "item": [
+        {
+          "name": "Get Recent Reviews (public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/reviews/recent", "host": ["{{base_url}}"], "path": ["reviews", "recent"] }
+          }
+        },
+        {
+          "name": "Get Review by ID (public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/reviews/{{review_id}}", "host": ["{{base_url}}"], "path": ["reviews", "{{review_id}}"] }
+          }
+        },
+        {
+          "name": "Get Review by ID — not found (404)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/reviews/999999", "host": ["{{base_url}}"], "path": ["reviews", "999999"] }
+          }
+        },
+        {
+          "name": "Create Review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.id) pm.collectionVariables.set('review_id', res.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reviews", "host": ["{{base_url}}"], "path": ["reviews"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collectionId\": {{collection_id}},\n  \"rating\": 9.5,\n  \"content\": \"Masterpiece. The alchemy system and character development are unmatched.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Review — no rating AND no content (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reviews", "host": ["{{base_url}}"], "path": ["reviews"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collectionId\": {{collection_id}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Review — collection bukan milik user (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reviews", "host": ["{{base_url}}"], "path": ["reviews"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collectionId\": {{collection_id}},\n  \"rating\": 7.0,\n  \"content\": \"Trying to review someone else's collection.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reviews/{{review_id}}", "host": ["{{base_url}}"], "path": ["reviews", "{{review_id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 10.0,\n  \"content\": \"On rewatch — absolute 10/10. The ending hit different.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Review — milik user lain (403)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reviews/{{review_id}}", "host": ["{{base_url}}"], "path": ["reviews", "{{review_id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 1.0\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/reviews/{{review_id}}", "host": ["{{base_url}}"], "path": ["reviews", "{{review_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Search (Protected)",
+      "item": [
+        {
+          "name": "Unified Search — all",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/search?q=berserk&type=all",
+              "host": ["{{base_url}}"],
+              "path": ["search"],
+              "query": [{ "key": "q", "value": "berserk" }, { "key": "type", "value": "all" }]
+            }
+          }
+        },
+        {
+          "name": "Unified Search — anime only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/search?q=attack+on+titan&type=anime",
+              "host": ["{{base_url}}"],
+              "path": ["search"],
+              "query": [{ "key": "q", "value": "attack on titan" }, { "key": "type", "value": "anime" }]
+            }
+          }
+        },
+        {
+          "name": "Unified Search — user only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/search?q=ahmad&type=user",
+              "host": ["{{base_url}}"],
+              "path": ["search"],
+              "query": [{ "key": "q", "value": "ahmad" }, { "key": "type", "value": "user" }]
+            }
+          }
+        },
+        {
+          "name": "Unified Search — no query (400)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{base_url}}/search", "host": ["{{base_url}}"], "path": ["search"] }
+          }
+        },
+        {
+          "name": "Get Detail — by query params (anime)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/search/detail?id=5114&type=anime",
+              "host": ["{{base_url}}"],
+              "path": ["search", "detail"],
+              "query": [{ "key": "id", "value": "5114" }, { "key": "type", "value": "anime" }]
+            }
+          }
+        },
+        {
+          "name": "Get Detail — game",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/search/detail?id=1877&type=game",
+              "host": ["{{base_url}}"],
+              "path": ["search", "detail"],
+              "query": [{ "key": "id", "value": "1877" }, { "key": "type", "value": "game" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎬 Media Detail (Public)",
+      "item": [
+        {
+          "name": "Media Detail — anime",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/media/anime/5114", "host": ["{{base_url}}"], "path": ["media", "anime", "5114"] }
+          }
+        },
+        {
+          "name": "Media Detail — manga",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/media/manga/2", "host": ["{{base_url}}"], "path": ["media", "manga", "2"] }
+          }
+        },
+        {
+          "name": "Media Detail — game",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/media/game/1877", "host": ["{{base_url}}"], "path": ["media", "game", "1877"] }
+          }
+        },
+        {
+          "name": "Media Detail — invalid type (400)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/media/movie/5114", "host": ["{{base_url}}"], "path": ["media", "movie", "5114"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI (Protected)",
+      "item": [
+        {
+          "name": "Vibe Match",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/vibe-match", "host": ["{{base_url}}"], "path": ["ai", "vibe-match"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referenceIds\": [{{collection_id}}],\n  \"targetMediaTypes\": [\"anime\", \"manga\", \"game\"],\n  \"excludeTitles\": [\"Fullmetal Alchemist: Brotherhood\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Vibe Match — empty referenceIds (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/vibe-match", "host": ["{{base_url}}"], "path": ["ai", "vibe-match"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referenceIds\": [],\n  \"targetMediaTypes\": [\"anime\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Title Match",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/title-match", "host": ["{{base_url}}"], "path": ["ai", "title-match"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collectionId\": {{collection_id}},\n  \"excludeTitles\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Title Match — no collectionId (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/title-match", "host": ["{{base_url}}"], "path": ["ai", "title-match"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Generate Taste DNA",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/taste-dna", "host": ["{{base_url}}"], "path": ["ai", "taste-dna"] },
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Generate Taste DNA — collection kosong (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ai/taste-dna", "host": ["{{base_url}}"], "path": ["ai", "taste-dna"] },
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        }
+      ]
+    }
+  ]
+}
