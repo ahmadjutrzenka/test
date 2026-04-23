@@ -6,7 +6,6 @@ import {
   clearSession,
 } from "../features/recommendation/recommendationSlice";
 import { addToCollection } from "../features/collection/collectionSlice";
-import "./VibeMatchPage.css";
 
 const MEDIA_TYPES = ["anime", "manga", "game"];
 const STATUSES = ["plan", "ongoing", "completed", "dropped"];

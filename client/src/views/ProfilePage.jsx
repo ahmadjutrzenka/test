@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
 import axios from "axios";
@@ -9,16 +9,19 @@ import {
 } from "../features/collection/collectionSlice";
 import { generateTasteDNA } from "../features/tasteDna/tasteDnaSlice";
 import { BASE_URL } from "../constants/url";
-import "./UserProfilePage.css";
-import "./ProfilePage.css";
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
   const { items } = useSelector((s) => s.collection);
-  const { content: dnaContent, loading: dnaLoading } = useSelector(
+  const { content: dnaSliceContent, loading: dnaLoading } = useSelector(
     (s) => s.tasteDna,
   );
+  const dnaContent = dnaSliceContent ?? user?.TasteDNA?.content ?? null;
+
+  useEffect(() => {
+    dispatch(fetchCollections());
+  }, [dispatch]);
 
   const [bio, setBio] = useState(user?.bio || "");
   const [bioSaving, setBioSaving] = useState(false);

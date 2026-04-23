@@ -29,8 +29,8 @@ export const searchSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    clearDetail: (state) => {
-      state.detail = null;
+    clearResults: (state) => {
+      state.results = { anime: [], manga: [], game: [], users: [] };
     },
   },
 });
@@ -40,7 +40,7 @@ export const {
   searchSuccess,
   detailSuccess,
   searchFailed,
-  clearDetail,
+  clearResults,
 } = searchSlice.actions;
 
 const getHeaders = () => ({

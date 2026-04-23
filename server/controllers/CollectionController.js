@@ -1,4 +1,4 @@
-const { Collection } = require("../models");
+const { Review, User, Collection } = require("../models");
 
 class CollectionController {
   static async getMyCollections(req, res, next) {
@@ -19,6 +19,13 @@ class CollectionController {
       const collections = await Collection.findAll({
         where,
         order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Review,
+            required: false,
+            attributes: ["id", "rating", "content", "createdAt", "updatedAt"],
+          },
+        ],
       });
 
       res.status(200).json({ collections });

@@ -27,7 +27,13 @@ export const reviewSlice = createSlice({
     updateReviewSuccess: (state, action) => {
       const idx = state.reviews.findIndex((r) => r.id === action.payload.id);
       if (idx !== -1) {
-        state.reviews[idx] = action.payload;
+        state.reviews[idx] = {
+          ...state.reviews[idx],
+          rating: action.payload.rating,
+          content: action.payload.content,
+          updatedAt: action.payload.updatedAt,
+          isEdited: action.payload.isEdited,
+        };
       }
       state.loading = false;
     },

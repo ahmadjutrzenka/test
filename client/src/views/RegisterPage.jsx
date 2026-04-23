@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { register } from "../features/auth/authSlice";
 
 export default function RegisterPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { loading, error } = useSelector((s) => s.auth);
   const [form, setForm] = useState({ username: "", email: "", password: "" });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    await dispatch(register(form.username, form.email, form.password));
-    if (localStorage.getItem("access_token")) navigate("/");
+    sessionStorage.setItem("new_registration", "1");
+    dispatch(register(form.username, form.email, form.password));
   };
 
   return (

@@ -83,7 +83,7 @@ export const register = (username, email, password) => async (dispatch) => {
       email,
       password,
     });
-    dispatch(login(email, password));
+    await dispatch(login(email, password));
   } catch (error) {
     dispatch(
       loginFailed(error.response?.data?.message || "Registration failed"),

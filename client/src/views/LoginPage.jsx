@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
 import { login, googleLogin } from "../features/auth/authSlice";
 
 export default function LoginPage() {
@@ -45,6 +46,28 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
+        <div style={{ margin: "16px 0", textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: 13,
+              color: "var(--text-muted)",
+              marginBottom: 10,
+            }}
+          >
+            atau
+          </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <GoogleLogin
+              onSuccess={(res) => dispatch(googleLogin(res.credential))}
+              onError={() => {}}
+              useOneTap={false}
+              theme="filled_black"
+              shape="rectangular"
+              width="320"
+            />
+          </div>
+        </div>
+
         <p className="text-gray-400 text-sm mt-4 text-center">
           Belum punya akun?{" "}
           <Link to="/register" className="text-indigo-400 hover:underline">

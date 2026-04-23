@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import "./ReviewCarousel.css";
 
 function Avatar({ src, username, size = "sm" }) {
   const initial = username?.[0]?.toUpperCase() ?? "?";

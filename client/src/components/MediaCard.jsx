@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import "./MediaCard.css";
 
 export default function MediaCard({
   id,
@@ -15,6 +14,13 @@ export default function MediaCard({
 }) {
   const badgeClass = `badge badge-${mediaType}`;
   const statusClass = `status-chip status-${status}`;
+
+  const STATUS_LABELS = {
+    plan: "Planned",
+    ongoing: "Ongoing",
+    completed: "Completed",
+    dropped: "Dropped",
+  };
 
   return (
     <div className="media-card">
@@ -50,7 +56,9 @@ export default function MediaCard({
         </Link>
 
         <div className="media-card-meta">
-          <span className={badgeClass}>{mediaType}</span>
+          <span className={badgeClass}>
+            {mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}
+          </span>
           {score != null && (
             <span className="media-card-score">
               ★ {typeof score === "number" ? score.toFixed(1) : score}
@@ -58,7 +66,9 @@ export default function MediaCard({
           )}
         </div>
 
-        {status && <span className={statusClass}>{status}</span>}
+        {status && (
+          <span className={statusClass}>{STATUS_LABELS[status] ?? status}</span>
+        )}
 
         {/* Action buttons — hanya muncul kalau prop dikirim */}
         {(onEdit || onRemove) && (

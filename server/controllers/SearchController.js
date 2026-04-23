@@ -5,10 +5,69 @@ const {
   searchJikanAnime,
   searchJikanManga,
   searchIGDB,
+  getTopJikanAnime,
+  getTopJikanManga,
+  getTopIGDB,
 } = require("../helpers/externalApis");
 const { Op } = require("sequelize");
 
 class SearchController {
+  static async getPopular(req, res, next) {
+    try {
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const animeRaw = await getTopJikanAnime(3);
+      await delay(400);
+      const mangaRaw = await getTopJikanManga(3);
+      const gameRaw = await getTopIGDB(3);
+
+      const anime = animeRaw.map((item) => ({
+        externalId: String(item.mal_id),
+        title: item.title,
+        coverUrl:
+          item.images?.jpg?.large_image_url ||
+          item.images?.jpg?.image_url ||
+          null,
+        score: item.score || null,
+        genres: item.genres?.map((g) => g.name) || [],
+        synopsis: item.synopsis || null,
+        mediaType: "anime",
+      }));
+
+      const manga = mangaRaw.map((item) => ({
+        externalId: String(item.mal_id),
+        title: item.title,
+        coverUrl:
+          item.images?.jpg?.large_image_url ||
+          item.images?.jpg?.image_url ||
+          null,
+        score: item.score || null,
+        genres: item.genres?.map((g) => g.name) || [],
+        synopsis: item.synopsis || null,
+        mediaType: "manga",
+      }));
+
+      const game = gameRaw.map((item) => {
+        const rawCover = item.cover?.url || null;
+        return {
+          externalId: String(item.id),
+          title: item.name,
+          coverUrl: rawCover
+            ? "https:" + rawCover.replace("t_thumb", "t_cover_big")
+            : null,
+          score: item.rating ? Math.round(item.rating) / 10 : null,
+          genres: item.genres?.map((g) => g.name) || [],
+          synopsis: item.summary || null,
+          mediaType: "game",
+        };
+      });
+
+      res.status(200).json({ anime, manga, game });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getMediaDetails(req, res, next) {
     try {
       const { type, externalId } = req.params;
@@ -77,7 +136,7 @@ class SearchController {
     try {
       const { q, type = "all" } = req.query;
 
-      if (!q) {
+      if (!q && type !== "user") {
         throw {
           name: "BadRequest",
           message: "Query parameter 'q' is required",

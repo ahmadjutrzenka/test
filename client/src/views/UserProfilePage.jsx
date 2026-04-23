@@ -5,7 +5,6 @@ import axios from "axios";
 import { BASE_URL } from "../constants/url";
 import MediaCard from "../components/MediaCard";
 import { generateTasteDNA } from "../features/tasteDna/tasteDnaSlice";
-import "./UserProfilePage.css";
 
 export default function UserProfilePage() {
   const { username } = useParams();

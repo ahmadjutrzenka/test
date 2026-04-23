@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
-import { searchMedia } from "../features/search/searchSlice";
+import { searchMedia, clearResults } from "../features/search/searchSlice";
 import { addToCollection } from "../features/collection/collectionSlice";
-import "./SearchPage.css";
 
 const SEARCH_TYPES = ["all", "anime", "manga", "game", "user"];
 const STATUSES = ["plan", "ongoing", "completed", "dropped"];
+const STATUS_LABELS = {
+  plan: "Plan to Watch",
+  ongoing: "Ongoing",
+  completed: "Completed",
+  dropped: "Dropped",
+};
 
 export default function SearchPage() {
   const dispatch = useDispatch();
@@ -15,11 +20,22 @@ export default function SearchPage() {
 
   const [q, setQ] = useState("");
   const [type, setType] = useState("all");
-  const [addModal, setAddModal] = useState(null); // media item to add
+  const [addModal, setAddModal] = useState(null);
+
+  // Auto-fetch all users when switching to user tab
+  useEffect(() => {
+    if (type === "user") {
+      dispatch(searchMedia("", "user"));
+    }
+  }, [type, dispatch]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (q.trim()) dispatch(searchMedia(q.trim(), type));
+    if (type === "user") {
+      dispatch(searchMedia(q.trim() || "", "user"));
+    } else if (q.trim()) {
+      dispatch(searchMedia(q.trim(), type));
+    }
   };
 
   const isInCollection = (externalId, mediaType) =>
@@ -52,38 +68,47 @@ export default function SearchPage() {
       <h1 className="search-title">Search</h1>
 
       <form className="search-form" onSubmit={handleSearch}>
-        <input
-          className="input search-input"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search anime, manga, games, or users…"
-        />
+        <div className="search-input-wrap">
+          <input
+            className="input search-input"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={
+              type === "user"
+                ? "Filter by username…"
+                : "Search anime, manga, games, or users…"
+            }
+          />
+          <button
+            type="submit"
+            className="search-input-btn"
+            disabled={loading || (type !== "user" && !q.trim())}
+          >
+            {loading ? "…" : "Search"}
+          </button>
+        </div>
         <div className="search-type-tabs">
           {SEARCH_TYPES.map((t) => (
             <button
               type="button"
               key={t}
               className={`type-tab ${type === t ? "active" : ""}`}
-              onClick={() => setType(t)}
+              onClick={() => {
+                setType(t);
+                dispatch(clearResults());
+              }}
             >
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
         </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading || !q.trim()}
-        >
-          {loading ? "Searching…" : "Search"}
-        </button>
       </form>
 
-      {/* User results */}
-      {results.users?.length > 0 && (
+      {/* User-only tab — grid 4 kolom */}
+      {type === "user" && results.users?.length > 0 && (
         <section className="search-section">
           <h2 className="search-section-title">Users</h2>
-          <div className="user-results">
+          <div className="user-results-grid">
             {results.users.map((u) => (
               <Link
                 to={`/users/${u.username}`}
@@ -108,72 +133,111 @@ export default function SearchPage() {
         </section>
       )}
 
-      {/* Media results */}
-      {mediaTypes
-        .filter((t) => type === "all" || type === t)
-        .map((mt) => {
-          const list = results[mt] || [];
-          if (list.length === 0) return null;
-          return (
-            <section className="search-section" key={mt}>
-              <h2 className="search-section-title">
-                <span className={`badge badge-${mt}`}>{mt}</span>
-              </h2>
-              <div className="search-media-grid">
-                {list.map((item) => {
-                  const inCol = isInCollection(item.externalId, item.mediaType);
-                  return (
-                    <div className="search-media-card" key={item.externalId}>
-                      <Link
-                        to={`/media/${item.mediaType}/${item.externalId}`}
-                        className="search-media-cover-link"
-                      >
-                        <img
-                          src={
-                            item.coverUrl ||
-                            `https://placehold.co/100x145/1e1e2a/7c7a8a?text=${mt}`
-                          }
-                          alt={item.title}
-                          loading="lazy"
-                        />
-                      </Link>
-                      <div className="search-media-info">
-                        <Link
-                          to={`/media/${item.mediaType}/${item.externalId}`}
-                          className="search-media-title"
-                        >
-                          {item.title}
-                        </Link>
-                        {item.score != null && (
-                          <span className="search-media-score">
-                            ★ {item.score}
-                          </span>
-                        )}
-                        {item.genres?.length > 0 && (
-                          <p className="search-media-genres">
-                            {item.genres.slice(0, 3).join(" · ")}
-                          </p>
-                        )}
-                        {inCol ? (
-                          <span className="search-in-collection">
-                            ✓ In collection
-                          </span>
-                        ) : (
-                          <button
-                            className="btn btn-secondary search-add-btn"
-                            onClick={() => setAddModal(item)}
-                          >
-                            + Add
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+      {/* All/media tabs — kolom berdampingan */}
+      {type !== "user" &&
+        (() => {
+          const activeMediaTypes = ["anime", "manga", "game"].filter(
+            (t) =>
+              (type === "all" || type === t) && (results[t] || []).length > 0,
           );
-        })}
+          const showUsers = results.users?.length > 0;
+          if (activeMediaTypes.length === 0 && !showUsers) return null;
+          return (
+            <div className="search-results-columns">
+              {activeMediaTypes.map((mt) => (
+                <div key={mt} className="search-results-col">
+                  <h2 className="search-section-title">
+                    <span className={`badge badge-${mt}`}>
+                      {mt.charAt(0).toUpperCase() + mt.slice(1)}
+                    </span>
+                  </h2>
+                  <div className="search-col-items">
+                    {(results[mt] || []).map((item) => {
+                      const inCol = isInCollection(
+                        item.externalId,
+                        item.mediaType,
+                      );
+                      return (
+                        <div className="search-col-card" key={item.externalId}>
+                          <Link
+                            to={`/media/${item.mediaType}/${item.externalId}`}
+                            className="search-col-cover-link"
+                          >
+                            <img
+                              src={
+                                item.coverUrl ||
+                                `https://placehold.co/48x68/1e1e2a/7c7a8a?text=${mt}`
+                              }
+                              alt={item.title}
+                              loading="lazy"
+                            />
+                          </Link>
+                          <div className="search-col-info">
+                            <Link
+                              to={`/media/${item.mediaType}/${item.externalId}`}
+                              className="search-media-title"
+                            >
+                              {item.title}
+                            </Link>
+                            {item.score != null && (
+                              <span className="search-media-score">
+                                ★ {item.score}
+                              </span>
+                            )}
+                            {item.genres?.length > 0 && (
+                              <p className="search-media-genres">
+                                {item.genres.slice(0, 2).join(" · ")}
+                              </p>
+                            )}
+                            {inCol ? (
+                              <span className="search-in-collection">
+                                ✓ In collection
+                              </span>
+                            ) : (
+                              <button
+                                className="btn btn-secondary search-add-btn"
+                                onClick={() => setAddModal(item)}
+                              >
+                                + Add
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              {showUsers && (
+                <div className="search-results-col">
+                  <h2 className="search-section-title">Users</h2>
+                  <div className="search-col-items">
+                    {results.users.map((u) => (
+                      <Link
+                        to={`/users/${u.username}`}
+                        key={u.id}
+                        className="search-col-user-card"
+                      >
+                        {u.avatar ? (
+                          <img
+                            src={u.avatar}
+                            alt={u.username}
+                            className="user-result-avatar"
+                          />
+                        ) : (
+                          <div className="user-result-avatar-placeholder">
+                            {u.username[0].toUpperCase()}
+                          </div>
+                        )}
+                        <span className="user-result-name">{u.username}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
       {/* Add modal */}
       {addModal && (
@@ -190,7 +254,7 @@ export default function SearchPage() {
                 <select name="status" className="input">
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
-                      {s}
+                      {STATUS_LABELS[s]}
                     </option>
                   ))}
                 </select>

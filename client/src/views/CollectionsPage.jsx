@@ -6,18 +6,27 @@ import {
   removeFromCollection,
 } from "../features/collection/collectionSlice";
 import { createReview, updateReview } from "../features/review/reviewSlice";
+import { Link, useSearchParams } from "react-router";
 import MediaCard from "../components/MediaCard";
-import "./CollectionsPage.css";
 
 const TYPES = ["all", "anime", "manga", "game"];
 const STATUSES = ["plan", "ongoing", "completed", "dropped"];
+
+const STATUS_LABELS = {
+  plan: "Planned",
+  ongoing: "Ongoing",
+  completed: "Completed",
+  dropped: "Dropped",
+};
 
 export default function CollectionsPage() {
   const dispatch = useDispatch();
   const { items, loading, error } = useSelector((s) => s.collection);
   const [typeFilter, setTypeFilter] = useState("all");
-  const [editModal, setEditModal] = useState(null); // collection item being edited
-  const [reviewModal, setReviewModal] = useState(null); // collection item getting reviewed
+  const [editModal, setEditModal] = useState(null);
+  const [reviewModal, setReviewModal] = useState(null);
+  const [searchParams] = useSearchParams();
+  const isTitleMatchMode = searchParams.get("mode") === "title-match";
 
   useEffect(() => {
     dispatch(fetchCollections());
@@ -92,7 +101,11 @@ export default function CollectionsPage() {
         <p className="page-loading">Loading…</p>
       ) : filtered.length === 0 ? (
         <p className="page-empty">
-          No {typeFilter === "all" ? "" : typeFilter + " "}titles yet.
+          No{" "}
+          {typeFilter === "all"
+            ? ""
+            : typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1) + " "}
+          titles yet.
         </p>
       ) : (
         <div className="card-grid collections-grid">
@@ -116,6 +129,12 @@ export default function CollectionsPage() {
               >
                 {c.Review ? "Edit review" : "+ Review"}
               </button>
+              <Link
+                to={`/title-match/${c.id}`}
+                className={`btn btn-secondary collection-review-btn ${isTitleMatchMode ? "title-match-highlight" : ""}`}
+              >
+                Title Match →
+              </Link>
             </div>
           ))}
         </div>
@@ -139,7 +158,7 @@ export default function CollectionsPage() {
                 >
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
-                      {s}
+                      {STATUS_LABELS[s] || s}
                     </option>
                   ))}
                 </select>

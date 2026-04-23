@@ -12,6 +12,7 @@ import TitleMatchPage from "./views/TitleMatchPage";
 import MediaDetailPage from "./views/MediaDetailPage";
 import UserProfilePage from "./views/UserProfilePage";
 import ProfilePage from "./views/ProfilePage";
+import OnboardingPage from "./views/OnboardingPage";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/users/:username" element={<UserProfilePage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
+      <Route path="/onboarding" element={<OnboardingPage />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

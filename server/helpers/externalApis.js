@@ -57,7 +57,7 @@ async function getDetailIGDB(id) {
   const token = await getIGDBToken();
   const response = await axios.post(
     "https://api.igdb.com/v4/games",
-    `fields name,cover.url,genres.name,summary,rating,first_release_date,involved_companies.company.name; where id = ${id};`,
+    `fields name,cover.url,genres.name,themes.name,summary,storyline,rating,rating_count,first_release_date,involved_companies.company.name,involved_companies.developer,involved_companies.publisher,platforms.name; where id = ${id};`,
     {
       headers: {
         "Client-ID": process.env.IGDB_CLIENT_ID,
@@ -111,6 +111,36 @@ async function enrichAIResults(results) {
   return enriched;
 }
 
+async function getTopJikanAnime(limit = 3) {
+  const response = await axios.get("https://api.jikan.moe/v4/top/anime", {
+    params: { limit },
+  });
+  return response.data.data || [];
+}
+
+async function getTopJikanManga(limit = 3) {
+  const response = await axios.get("https://api.jikan.moe/v4/top/manga", {
+    params: { limit },
+  });
+  return response.data.data || [];
+}
+
+async function getTopIGDB(limit = 3) {
+  const token = await getIGDBToken();
+  const response = await axios.post(
+    "https://api.igdb.com/v4/games",
+    `fields name,cover.url,genres.name,summary,rating,first_release_date; sort rating desc; where rating > 85 & rating_count > 500; limit ${limit};`,
+    {
+      headers: {
+        "Client-ID": process.env.IGDB_CLIENT_ID,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "text/plain",
+      },
+    },
+  );
+  return response.data || [];
+}
+
 module.exports = {
   getIGDBToken,
   searchJikanAnime,
@@ -119,4 +149,7 @@ module.exports = {
   getDetailJikan,
   getDetailIGDB,
   enrichAIResults,
+  getTopJikanAnime,
+  getTopJikanManga,
+  getTopIGDB,
 };
